@@ -1,4 +1,9 @@
 package com.nino.opentrivia.model.dto;
 
-public class QuestionDto {
-}
+import java.util.List;
+
+public record QuestionDto(
+        int id,
+        String prompt,
+        List<String> choices
+) {}
