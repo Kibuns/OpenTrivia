@@ -1,4 +1,10 @@
 package com.nino.opentrivia.model.domain;
 
-public class QuizQuestion {
-}
+import java.util.List;
+
+public record QuizQuestion(
+        int id,
+        String prompt,
+        List<String> choices,
+        String correctAnswer
+) {}

@@ -2,23 +2,39 @@ package com.nino.opentrivia.controller;
 
 import com.nino.opentrivia.model.dto.GetQuestionsResponse;
 import com.nino.opentrivia.model.dto.QuestionDto;
+import com.nino.opentrivia.model.domain.Quiz;
+import com.nino.opentrivia.model.domain.QuizQuestion;
+import com.nino.opentrivia.service.QuizService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
+@Validated
 public class QuizController {
+
+    private final QuizService quizService;
+
+    public QuizController(QuizService quizService) {
+        this.quizService = quizService;
+    }
 
     @GetMapping("/questions")
     public GetQuestionsResponse getQuestions(
-            @RequestParam(defaultValue = "5") int amount
+            @RequestParam(defaultValue = "5") @Min(1) @Max(50) int amount,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String difficulty
     ) {
-        // Hardcoded quiz voor milestone 1
-        var q1 = new QuestionDto(1, "Wat is 2 + 2?", List.of("3","4","5","6"));
-        var q2 = new QuestionDto(2, "Is de aarde rond?", List.of("Ja","Nee"));
+        Quiz quiz = quizService.startQuiz(amount, category, difficulty);
 
-        return new GetQuestionsResponse(UUID.randomUUID(), List.of(q1, q2));
+        List<QuestionDto> questions = quiz.questions().stream()
+                .map(q -> new QuestionDto(q.id(), q.prompt(), q.choices()))
+                .toList();
+
+        return new GetQuestionsResponse(quiz.quizId(), questions);
     }
 }
