@@ -1,4 +1,9 @@
 package com.nino.opentrivia.model.dto;
 
-public class CheckAnswersRequest {
-}
+import java.util.List;
+import java.util.UUID;
+
+public record CheckAnswersRequest(
+        UUID quizId,
+        List<AnswerDto> answers
+) {}

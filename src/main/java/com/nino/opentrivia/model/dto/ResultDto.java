@@ -1,4 +1,6 @@
 package com.nino.opentrivia.model.dto;
 
-public class ResultDto {
-}
+public record ResultDto(
+        int questionId,
+        boolean correct
+) {}

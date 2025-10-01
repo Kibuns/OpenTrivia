@@ -1,4 +1,6 @@
 package com.nino.opentrivia.model.dto;
 
-public class AnswerDto {
-}
+public record AnswerDto(
+        int questionId,
+        String choice
+) {}

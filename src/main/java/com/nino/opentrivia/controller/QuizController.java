@@ -1,10 +1,10 @@
 package com.nino.opentrivia.controller;
 
-import com.nino.opentrivia.model.dto.GetQuestionsResponse;
-import com.nino.opentrivia.model.dto.QuestionDto;
+import com.nino.opentrivia.model.dto.*;
 import com.nino.opentrivia.model.domain.Quiz;
 import com.nino.opentrivia.model.domain.QuizQuestion;
 import com.nino.opentrivia.service.QuizService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.validation.annotation.Validated;
@@ -36,5 +36,17 @@ public class QuizController {
                 .toList();
 
         return new GetQuestionsResponse(quiz.quizId(), questions);
+    }
+
+    @PostMapping("/checkanswers")
+    public CheckAnswersResponse checkAnswers(@Valid @RequestBody CheckAnswersRequest request) {
+        //STUB RESPONSE!!!
+        return new CheckAnswersResponse(
+                request.answers().size(),
+                0,
+                request.answers().stream()
+                        .map(a -> new ResultDto(a.questionId(), false))
+                        .toList()
+        );
     }
 }
