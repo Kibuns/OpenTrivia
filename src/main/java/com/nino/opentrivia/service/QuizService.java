@@ -3,6 +3,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.nino.opentrivia.client.OpenTdbClient;
 import com.nino.opentrivia.model.domain.Quiz;
 import com.nino.opentrivia.model.domain.QuizQuestion;
+import com.nino.opentrivia.model.dto.CheckAnswersResponse;
+import com.nino.opentrivia.model.dto.ResultDto;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -51,6 +53,7 @@ public class QuizService {
         Quiz quiz = new Quiz(quizId, Instant.now(), List.copyOf(quizQuestions));
 
         cache.put(quizId, quiz);
+
         return quiz;
     }
 
@@ -59,6 +62,28 @@ public class QuizService {
         if (quiz == null) {
             throw new NoSuchElementException("Quiz not found or expired");
         }
+
         return quiz;
+    }
+
+    public CheckAnswersResponse checkAnswers(UUID quizId, Map<Integer, String> submittedAnswers) {
+        Quiz quiz = getQuiz(quizId); // haal quiz uit cache of gooit 404
+
+        int correct = 0;
+        List<ResultDto> details = new ArrayList<>();
+
+        for (QuizQuestion q : quiz.questions()) {
+            String submitted = submittedAnswers.get(q.id());
+            boolean isCorrect = submitted != null && submitted.equals(q.correctAnswer());
+
+            if (isCorrect) correct++;
+            details.add(new ResultDto(q.id(), isCorrect));
+        }
+
+        return new CheckAnswersResponse(
+                quiz.questions().size(),
+                correct,
+                details
+        );
     }
 }
