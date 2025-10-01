@@ -80,6 +80,8 @@ public class QuizService {
             details.add(new ResultDto(q.id(), isCorrect));
         }
 
+        cache.invalidate(quizId);
+
         return new CheckAnswersResponse(
                 quiz.questions().size(),
                 correct,
