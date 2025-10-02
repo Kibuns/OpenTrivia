@@ -77,7 +77,7 @@ public class QuizService {
             boolean isCorrect = submitted != null && submitted.equals(q.correctAnswer());
 
             if (isCorrect) correct++;
-            details.add(new ResultDto(q.id(), isCorrect));
+            details.add(new ResultDto(q.id(), isCorrect, q.correctAnswer()));
         }
 
         cache.invalidate(quizId);

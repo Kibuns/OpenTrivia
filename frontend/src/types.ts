@@ -22,5 +22,9 @@ export interface CheckAnswersRequest {
 export interface CheckAnswersResponse {
   total: number;
   correct: number;
-  details: { questionId: number; correct: boolean }[];
+  details: {
+    questionId: number;
+    correct: boolean;
+    correctAnswer: string;
+  }[];
 }

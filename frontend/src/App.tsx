@@ -88,19 +88,31 @@ export default function App() {
         </div>
       )}
 
-      {phase === 'result' && result && (
+      {phase === 'result' && result && quiz && (
         <div>
           <h2>Result: {result.correct} / {result.total} correct</h2>
           <ul>
-            {result.details.map((d) => (
-              <li key={d.questionId}>
-                Question {d.questionId}: {d.correct ? '✅' : '❌'}
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => setPhase('idle')}>New quiz</button>
-        </div>
-      )}
+            {result.details.map((d) => {
+              const q = quiz.questions.find(q => q.id === d.questionId);
+              const userAnswer = answers[d.questionId];
+              return (
+                <li key={d.questionId} style={{ marginBottom: '1rem' }}>
+                  <p><strong>{q?.prompt}</strong></p>
+                  <p>Your answer: {userAnswer}</p>
+                  {d.correct ? (
+                    <p style={{ color: 'green' }}>✅ Correct!</p>
+                  ) : (
+                    <p style={{ color: 'crimson' }}>
+                      ❌ Wrong. Correct answer: {d.correctAnswer}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+    </ul>
+    <button onClick={() => setPhase('idle')}>New quiz</button>
+  </div>
+)}
     </div>
   );
 }
