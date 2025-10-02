@@ -60,7 +60,7 @@ class QuizControllerTest {
         CheckAnswersResponse mockResponse = new CheckAnswersResponse(
                 1,
                 1,
-                List.of(new ResultDto(1, true))
+                List.of(new ResultDto(1, true, "4"))
         );
 
         Mockito.when(quizService.checkAnswers(
@@ -74,7 +74,8 @@ class QuizControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.correct").value(1))
                 .andExpect(jsonPath("$.details[0].questionId").value(1))
-                .andExpect(jsonPath("$.details[0].correct").value(true));
+                .andExpect(jsonPath("$.details[0].correct").value(true))
+                .andExpect(jsonPath("$.details[0].correctAnswer").value("4"));
     }
 
     @Test
