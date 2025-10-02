@@ -1,53 +1,76 @@
 import { useState } from 'react';
 import { startQuiz, checkAnswers } from './api';
-import type { QuizResponse, CheckAnswersResponse, AnswerDto } from './types';
+import type { QuizResponse, AnswerDto, CheckAnswersResponse } from './types';
+
+type Phase = 'idle' | 'loading' | 'playing' | 'result' | 'error';
 
 export default function App() {
+  const [phase, setPhase] = useState<Phase>('idle');
   const [quiz, setQuiz] = useState<QuizResponse | null>(null);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [result, setResult] = useState<CheckAnswersResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleStart() {
     try {
-      const q = await startQuiz(3); // haal 3 vragen op
+      setPhase('loading');
+      const q = await startQuiz(3);
       setQuiz(q);
       setAnswers({});
       setResult(null);
-    } catch (e) {
-      console.error(e);
+      setPhase('playing');
+    } catch (e: any) {
+      setError(e.message ?? "Couldn't start quiz");
+      setPhase('error');
     }
-  }
-
-  function handleAnswer(questionId: number, choice: string) {
-    setAnswers(prev => ({ ...prev, [questionId]: choice }));
   }
 
   async function handleSubmit() {
     if (!quiz) return;
-    const payload = {
-      quizId: quiz.quizId,
-      answers: Object.entries(answers).map(([id, choice]) => ({
-        questionId: Number(id),
-        choice
-      })) as AnswerDto[]
-    };
-    const r = await checkAnswers(payload);
-    setResult(r);
+    try {
+      setPhase('loading');
+      const payload = {
+        quizId: quiz.quizId,
+        answers: Object.entries(answers).map(([id, choice]) => ({
+          questionId: Number(id),
+          choice,
+        })) as AnswerDto[],
+      };
+      const r = await checkAnswers(payload);
+      setResult(r);
+      setPhase('result');
+    } catch (e: any) {
+      setError(e.message ?? 'Error checking answers');
+      setPhase('error');
+    }
+  }
+
+  function handleAnswer(questionId: number, choice: string) {
+    setAnswers((prev) => ({ ...prev, [questionId]: choice }));
   }
 
   return (
     <div style={{ maxWidth: 600, margin: '2rem auto', fontFamily: 'sans-serif' }}>
       <h1>Trivia Quiz</h1>
 
-      {!quiz && <button onClick={handleStart}>Start quiz</button>}
+      {phase === 'idle' && <button onClick={handleStart}>Start quiz</button>}
 
-      {quiz && !result && (
+      {phase === 'loading' && <p>Loading...</p>}
+
+      {phase === 'error' && (
+        <div>
+          <p style={{ color: 'crimson' }}>{error}</p>
+          <button onClick={() => setPhase('idle')}>Opnieuw proberen</button>
+        </div>
+      )}
+
+      {phase === 'playing' && quiz && !result && (
         <div>
           <ol>
-            {quiz.questions.map(q => (
+            {quiz.questions.map((q) => (
               <li key={q.id} style={{ marginBottom: '1rem' }}>
                 <p>{q.prompt}</p>
-                {q.choices.map(c => (
+                {q.choices.map((c) => (
                   <label key={c} style={{ display: 'block' }}>
                     <input
                       type="radio"
@@ -65,17 +88,17 @@ export default function App() {
         </div>
       )}
 
-      {result && (
+      {phase === 'result' && result && (
         <div>
-          <h2>Result: {result.correct} / {result.total} correct</h2>
+          <h2>Result: {result.correct} / {result.total} goed</h2>
           <ul>
-            {result.details.map(d => (
+            {result.details.map((d) => (
               <li key={d.questionId}>
-                Question {d.questionId}: {d.correct ? '✅' : '❌'}
+                Vraag {d.questionId}: {d.correct ? '✅' : '❌'}
               </li>
             ))}
           </ul>
-          <button onClick={() => setQuiz(null)}>Start new quiz</button>
+          <button onClick={() => setPhase('idle')}>Nieuwe quiz</button>
         </div>
       )}
     </div>
