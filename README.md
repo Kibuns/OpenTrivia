@@ -12,8 +12,8 @@ This project implements the requirements from the [Quad assignment](https://www.
 - A backend that connects to the OpenTDB API and caches quizzes
 - REST endpoints to start a new quiz and to check answers
 - A simple frontend that consumes these endpoints
-- Error handling (including validation and Too Many Requests from OpenTDB)
-- A clear code structure with tests
+- Error handling
+- backend tests
 
 ---
 
@@ -43,6 +43,13 @@ The backend is built with **Java 21** and **Spring Boot v3.5.6**.
   - `default`: live integration with OpenTDB
 - **Caching**: quizzes are cached in-memory with Caffeine (TTL expire in 30mins or when answers are checked)
 - **Error handling**: global exception handler
+
+
+### Prereqs
+- **Node.js**: v22.12+ (LTS recommended)  
+- **Java JDK**: 21+ (make sure `JAVA_HOME` points to your JDK installation)  
+- **Maven Wrapper**: included in the repo (`mvnw` / `mvnw.cmd`), no separate Maven install required  
+- **Git**: to clone the repository 
 
 ### Run backend
 ```bash
