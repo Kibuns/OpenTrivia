@@ -1,15 +1,101 @@
-# OpenTrivia Backend (Spring Boot)
+# OpenTrivia Fullstack Quiz Application
 
-Deze backend is onderdeel van een quizapplicatie gebaseerd op de Open Trivia Database.\
-De backend is geschreven in Java met Spring Boot.
-## Endpoints
+This repo contains a fullstack implementation of the OpenTrivia Assignment for Quad Solutions. The application is split into two parts:
+- **Backend (Spring Boot, Java)**
+- **Frontend (React, Vite, TypeScript)**
+
+---
+
+## Assignment Goals
+This project implements the requirements from the [Quad assignment](https://www.quad.team/assignment) by offering:
+
+- A backend that connects to the OpenTDB API and caches quizzes
+- REST endpoints to start a new quiz and to check answers
+- A simple frontend that consumes these endpoints
+- Error handling (including validation and Too Many Requests from OpenTDB)
+- A clear code structure with tests
+
+---
+
+## Project Structure
+
+```
+OpenTrivia/
+├── backend/        # Spring Boot app (API + caching + error handling)
+│   ├── src/
+│   └── pom.xml
+├── frontend/       # React + Vite + TypeScript UI
+│   ├── src/
+│   └── package.json
+└── README.md       # This file
+```
+
+---
+
+## Backend
+The backend is built with **Java 21** and **Spring Boot v3.5.6**.
+
+### Features
+- `GET /api/questions` → start a new quiz (returns quizId and questions)
+- `POST /api/checkanswers` → submit answers, returns score and correct answers
+- **Profiles**:
+  - `stub`: returns fixed test data
+  - `default`: live integration with OpenTDB
+- **Caching**: quizzes are cached in-memory with Caffeine (TTL expire in 30mins or when answers are checked)
+- **Error handling**: global exception handler
+
+### Run backend
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+Default port: `http://localhost:8080`
+
+Use stub profile:
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=stub
+```
+
+### Tests
+Unit and controller tests are included. Run them with:
+```bash
+./mvnw test
+```
+
+---
+
+## Frontend
+The frontend is a **React app** bootstrapped with **Vite + TypeScript**.
+
+### Features
+- Start a new quiz with 3 questions
+- Answer multiple choice questions
+- Submit answers and see result
+- Result screen shows:
+  - Full question text
+  - User answer
+  - If wrong: correct answer
+- Loading and error states
+
+### Run frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Default port: `http://localhost:5173`
+
+### Proxy configuration
+Vite is configured to proxy `/api` to `http://localhost:8080`. This way the frontend calls the backend without CORS issues.
+
+---
+
+## Example API Usage
 
 ### GET /api/questions
-
-Start een nieuwe quiz. Haalt trivia-vragen op en retourneert een `quizId` + vragenlijst (zonder juiste antwoorden).
-
-**Voorbeeldresponse:**
-
+Response:
 ```json
 {
   "quizId": "abcd-1234...",
@@ -24,11 +110,7 @@ Start een nieuwe quiz. Haalt trivia-vragen op en retourneert een `quizId` + vrag
 ```
 
 ### POST /api/checkanswers
-
-Controleert antwoorden voor een quiz op basis van `quizId`.
-
-**Voorbeeldrequest:**
-
+Request:
 ```json
 {
   "quizId": "abcd-1234...",
@@ -37,43 +119,56 @@ Controleert antwoorden voor een quiz op basis van `quizId`.
   ]
 }
 ```
-
-**Voorbeeldresponse:**
-
+Response:
 ```json
 {
   "total": 1,
   "correct": 1,
   "details": [
-    { "questionId": 1, "correct": true }
+    {
+      "questionId": 1,
+      "correct": true,
+      "correctAnswer": "4"
+    }
   ]
 }
 ```
 
-## Profielen
+---
 
-| Profiel | Omschrijving                |
-| ------- | --------------------------- |
-| `stub`  | Retourneert vaste testdata  |
-| default | Live-verbinding met OpenTDB |
+## Tech Stack
+- **Backend**: Java, Spring Boot, Maven, Caffeine cache
+- **Frontend**: React, Vite, TypeScript
+- **Testing**: Spring Boot Test, MockMvc
 
-Gebruik `spring.profiles.active=stub` om in stub-modus te draaien.
+---
 
-## Runnen
+## How to run full application
+1. Start backend:
+   ```bash
+   cd backend
+   ./mvnw spring-boot:run
+   ```
+2. Start frontend:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+3. Open in browser:
+   [http://localhost:5173](http://localhost:5173)
 
-```bash
-./mvnw spring-boot:run
-```
+---
 
-Of met profiel:
+## Possible Improvements
+- Persist quiz results (currently in-memory only)
+- Add categories/difficulties/amount of questions support to frontend (already in backend)
+- Extend test coverage (integration tests for frontend)
+- CI/CD pipeline setup (GitHub Actions + Docker)
 
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=stub
-```
+---
 
-## Dependencies
+## Author
+Nino Verhaegh, 
+ChatGPT (helped with this README and some small issues)
 
-- Java 17+
-- Spring Boot 3.x
-- Caffeine cache
-- OpenTDB ([https://opentdb.com/](https://opentdb.com/))
