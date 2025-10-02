@@ -2,7 +2,11 @@ import type { QuizResponse, CheckAnswersResponse, CheckAnswersRequest } from './
 
 export async function startQuiz(amount = 5): Promise<QuizResponse> {
   const res = await fetch(`/api/questions?amount=${amount}`);
-  if (!res.ok) throw new Error(`Failed to get questions: ${res.status}`);
+  if (!res.ok) {
+    const problem = await res.json().catch(() => null);
+    const message = problem?.detail || `Failed to get questions: ${res.status}`;
+    throw new Error(message);
+  }
   return res.json();
 }
 
