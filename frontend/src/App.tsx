@@ -60,7 +60,7 @@ export default function App() {
       {phase === 'error' && (
         <div>
           <p style={{ color: 'crimson' }}>{error}</p>
-          <button onClick={() => setPhase('idle')}>Opnieuw proberen</button>
+          <button onClick={() => setPhase('idle')}>Try again</button>
         </div>
       )}
 
@@ -90,15 +90,15 @@ export default function App() {
 
       {phase === 'result' && result && (
         <div>
-          <h2>Result: {result.correct} / {result.total} goed</h2>
+          <h2>Result: {result.correct} / {result.total} correct</h2>
           <ul>
             {result.details.map((d) => (
               <li key={d.questionId}>
-                Vraag {d.questionId}: {d.correct ? '✅' : '❌'}
+                Question {d.questionId}: {d.correct ? '✅' : '❌'}
               </li>
             ))}
           </ul>
-          <button onClick={() => setPhase('idle')}>Nieuwe quiz</button>
+          <button onClick={() => setPhase('idle')}>New quiz</button>
         </div>
       )}
     </div>
