@@ -165,6 +165,7 @@ Response:
 - Add categories/difficulties/amount of questions support to frontend (already in backend)
 - Extend test coverage (integration tests for frontend)
 - CI/CD pipeline setup (GitHub Actions + Docker)
+- Replace deprecated @MockBean with @TestConfiguration beans.
 
 ---
 
