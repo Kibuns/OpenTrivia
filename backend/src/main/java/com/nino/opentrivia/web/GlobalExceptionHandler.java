@@ -3,9 +3,11 @@ package com.nino.opentrivia.web;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.NoSuchElementException;
 
@@ -41,6 +43,14 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setTitle("Invalid parameter value");
         problem.setDetail(ex.getMessage());
+        return problem;
+    }
+
+    @ExceptionHandler(HttpClientErrorException.TooManyRequests.class)
+    public ProblemDetail handleTooManyRequests(HttpClientErrorException.TooManyRequests ex) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.TOO_MANY_REQUESTS);
+        problem.setTitle("Too many requests to OpenTDB API");
+        problem.setDetail("Hold ur horses!!! Please wait before trying again.");
         return problem;
     }
 
