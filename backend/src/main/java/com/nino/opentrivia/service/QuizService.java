@@ -6,6 +6,7 @@ import com.nino.opentrivia.model.domain.QuizQuestion;
 import com.nino.opentrivia.model.dto.CheckAnswersResponse;
 import com.nino.opentrivia.model.dto.ResultDto;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.Instant;
 import java.util.*;
@@ -29,12 +30,13 @@ public class QuizService {
 
         int id = 1;
         for (OpenTdbClient.OpenTdbQuestion raw : rawQuestions) { //for each question with answer
-            String prompt = raw.question();
+            String prompt = HtmlUtils.htmlUnescape(raw.question());
+            String correct = HtmlUtils.htmlUnescape(raw.correct_answer());
 
             List<String> choices = new ArrayList<>();
             choices.add(raw.correct_answer());
             for (String wrong : raw.incorrect_answers()) {
-                choices.add(wrong);
+                choices.add(HtmlUtils.htmlUnescape(wrong));
             }
 
             Collections.shuffle(choices, random);
@@ -43,7 +45,7 @@ public class QuizService {
                     id++,
                     prompt,
                     List.copyOf(choices),
-                    raw.correct_answer()
+                    correct
             );
 
             quizQuestions.add(question);
@@ -77,7 +79,7 @@ public class QuizService {
             boolean isCorrect = submitted != null && submitted.equals(q.correctAnswer());
 
             if (isCorrect) correct++;
-            details.add(new ResultDto(q.id(), isCorrect, q.correctAnswer()));
+            details.add(new ResultDto(q.id(), isCorrect, HtmlUtils.htmlUnescape(q.correctAnswer())));
         }
 
         cache.invalidate(quizId);
