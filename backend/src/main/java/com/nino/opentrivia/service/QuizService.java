@@ -34,7 +34,7 @@ public class QuizService {
             String correct = HtmlUtils.htmlUnescape(raw.correct_answer());
 
             List<String> choices = new ArrayList<>();
-            choices.add(raw.correct_answer());
+            choices.add(HtmlUtils.htmlUnescape(raw.correct_answer()));
             for (String wrong : raw.incorrect_answers()) {
                 choices.add(HtmlUtils.htmlUnescape(wrong));
             }
